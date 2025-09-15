@@ -125,10 +125,128 @@ def atualizar_produto(estoque: dict) -> None:
     except ValueError:
         print("Erro! Entrada de dados inválida. Digite apenas números.")
 
-dados()
-obter_dados_cliente()
-solicitar_forma_pagamento()
-gerar_codigo_venda()
-calcula_frete()
-cadastrar_produto()
-atualizar_produto()
+def cadastrar_localidade(bairros: dict)-> None:
+    '''permite ao atendente cadastrar um novo bairro para entrega'''
+    nome_bairro = input("digite o nome do bairro:  ").lower().strip()
+    if nome_bairro in bairros:
+        print("Erro! bairro já cadastrado")
+        return
+    try:
+        nome_completo = input("Digite o nome completo do bairro: ").strip()
+        valor_frete = float(input(f"Digite o valor do frete para o bairro {nome_completo}: "))
+
+        if nome_bairro and valor_frete >= 0 and nome_completo:
+            bairros = [nome_bairro] = {"nome": nome_completo, "frete": valor_frete}
+            print(f"Localidade {nome_completo} com frete de {valor_frete:.2f} cadastrado com sucesso")
+
+        else:
+            print("Dados inválidos. O cadastro não foi realizado")
+            return
+    except ValueError:
+        print("entrada invalida! O valor do frete deve ser um numero.")
+
+def processar_pedido(paes_disponiveis: dict)-> tuple[dict, int, float, dict] | None:
+    """
+    processa o pedido do cliente, verfica o estoque e calcula o frete.
+    Retorna  uma tupla com odicionaro do pão,quantidade,valor total da compra eo o dicionario atualizado de paes
+    """
+    print('Temos os seguintes paes:')
+    for pao in paes_disponiveis.values():
+        print(f" - {pao["nome"]} ")
+
+    escolha_pao = input("qual pão você deseja?: ").lower().strip()
+    pao_encontrado = ""
+
+    for chave, pao in paes_disponiveis.items():
+        if pao["nome"].lower() == escolha_pao:
+            pao_encontrado = chave
+            break
+
+    if not pao_encontrado:
+        print("Opção invalida!")
+        return None
+    
+    pao_escolhido = paes_disponiveis[pao_encontrado]
+
+    try:
+        quantidade = int(input(f"Digite a quantidade do {pao_escolhido["nome"]}: "))
+
+        if quantidade <=0:
+            print("Quantidade inválida")
+            return None
+        
+
+    except ValueError:
+        print("Erro! Quantidade deve ser um numero inteiro.")
+        return None
+    
+    if quantidade > pao_escolhido["quantidade"]:
+        print(f"Infelizmente só tenho {pao_escolhido["quantidade"]} un deste pão")
+        return None
+    
+    paes_disponiveis[pao_encontrado]["quantidade"] -= quantidade
+    valor_compra = quantidade * pao_escolhido["valor"]
+
+    return pao_escolhido, quantidade, valor_compra, paes_disponiveis
+
+def iniciar_programa() -> None:
+    """ Função que inicia o loop principal do progama de vendas """
+    banco_dados = dados()
+    atendente = banco_dados["atendente"]
+    paes_estoque = banco_dados["paes"]
+    bairros_disponiveis = banco_dados["bairros"]
+    codigo_venda = banco_dados["codigo_venda_base"]
+
+    while True:
+        print(f"-- Bem vindo(a) a Padaria Desespero, sou o(a) atendente {atendente}")
+        print("-- Menu Principal --")
+        print("1. Iniciar vendas")
+        print("2. Gerenciar produtos")
+        print("3. Cadastrar nova localidade")
+        print("4. Sair do sistema")
+
+        opcao = input("Escolha a uma opção: ")
+
+        if opcao == "1":
+            pedido = processar_pedido(paes_estoque)
+            
+            if not pedido:
+                continue
+
+            pao_escolhio, qtd_pedido, valor_compra, paes_estoque = pedido
+            print(f"Seu pedido foi de {qtd_pedido} {pao_escolhio['nome']} ficou em R${valor_compra:.2f} ")
+            
+            forma_retirada = input("É para 1. retirar ou 2. entregar?: ")
+            valor_frete = 0.0
+            
+            if forma_retirada == "2":
+                bairro, valor_frete = calcula_frete(bairros_disponiveis)
+                print(f"Valor do frete para o bairro {bairros_disponiveis[bairro]['nome']} é de R${valor_frete:.2f}")                
+
+            elif forma_retirada != "1":
+                print("opção inválida!")
+                continue
+            dados_cliente = obter_dados_cliente()
+            forma_pagamento = solicitar_forma_pagamento()
+
+            valor_total_compra = valor_frete + valor_compra
+            codigo_venda = gerar_codigo_venda(codigo_venda)
+            banco_dados["codigo_venda_base"] = codigo_venda
+
+            print("-- Resumo da venda --")
+            print(f" Cliente: {dados_cliente['nome']}")
+            print(f"Valor dos paes: R${valor_compra:.2f}")
+            print(f"Valor do frete: R${valor_frete:.2f}")
+            print(f"Forma de pagamento: {forma_pagamento}")
+            print(f"Valor total da compra: R${valor_total_compra}")
+            print(f"Codigo da entrega:{codigo_venda}")
+
+        elif opcao == "2":
+            pass
+        elif opcao == "3":
+            pass
+        elif opcao == "4":
+            print("Saindo do sitema. Áte a proxima")
+            break
+        else:
+            print(f"Opção {opcao} invalida!")
