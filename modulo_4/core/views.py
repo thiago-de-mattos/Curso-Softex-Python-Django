@@ -1,9 +1,13 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+
 # Create your views here.
 def home(request):
-    return HttpResponse("<h1>Ola, Mundo! esta é minha primeira página de Django<h1>")
+# 1. Crie seu dicionário de contexto
+    context = {
+        'nome_usuario': 'Thiago',
+        'tecnologias': ['Python', 'Django', 'HTML', 'CSS']
+    }
+    return render(request, 'home.html', context)
 
 def login(request):
-    return HttpResponse("<h1> login <h1> " \
-    "<h2>cadastrar<h2>")
+    return 
