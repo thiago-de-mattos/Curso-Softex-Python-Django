@@ -7,7 +7,7 @@ html, body {
 
 main {
     flex: 1; 
-    background: linear-gradient(to bottom, #e0f7ff, #c2ebff); 
+    background: linear-gradient(#e0f7ff, #42bcf9); 
 }
 
 body {
