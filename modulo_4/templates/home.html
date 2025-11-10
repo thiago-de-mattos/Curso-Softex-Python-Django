@@ -38,4 +38,23 @@
     {% endfor %}
     </ul>
 
+     <hr><h2>Minha lisa de execucao (do Banco de Dados):</h2>
+
+    <ul>
+        {%for i in excucao%}
+            <li>
+            {{ i.nome }}
+            {% if i.concluida %}
+                (✓ Concluída)
+            {% else %}
+                (☐ Pendente)
+            {% endif %}
+            <br>
+            <small>Criada em: {{ i.criada_em }}</small>
+        </li>
+    {% empty %}
+        <li>Você ainda não tem execuções cadastradas.</li>
+    {% endfor %}
+    </ul>
+
 {% endblock %}
