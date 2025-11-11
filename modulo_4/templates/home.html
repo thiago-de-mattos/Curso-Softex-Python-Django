@@ -4,26 +4,26 @@
 
 {% block content %}
 
+<h1>Olá, {{ nome_usuario }}!</h1>
 
-    <h1>Olá, {{ nome_usuario }}!</h1>
+<p>Este HTML está separado do meu código Python.</p>
 
-    <p>Este HTML está separado do meu código Python.</p>
-
-    <h3>Tecnologias que estou aprendendo:</h3>
-    <ul>
+<h3>Tecnologias que estou aprendendo:</h3>
+<ul>
     {% for tec in tecnologias %}
         <li>{{ tec }}</li>
     {% endfor %}
-    </ul>
-    {% if nome_usuario == 'Thiago' %}
-        <p>Este é um conteúdo especial para o Thiago!</p>
-    {% endif %}
+</ul>
 
-    <hr><h2>Minha lisa de tarefas (do Banco de Dados):</h2>
+{% if nome_usuario == 'Thiago' %}
+    <p>Este é um conteúdo especial para o Thiago!</p>
+{% endif %}
 
-    <ul>
-        {%for tarefa in tarefas%}
-            <li>
+<hr><h2>Minha lista de tarefas (do Banco de Dados):</h2>
+
+<ul>
+    {% for tarefa in tarefas %}
+        <li>
             {{ tarefa.titulo }}
             {% if tarefa.concluida %}
                 (✓ Concluída)
@@ -36,25 +36,25 @@
     {% empty %}
         <li>Você ainda não tem tarefas cadastradas.</li>
     {% endfor %}
-    </ul>
+</ul>
 
-     <hr><h2>Minha lisa de execucao (do Banco de Dados):</h2>
+<hr><h2>Minhas execuções (do Banco de Dados):</h2>
 
-    <ul>
-        {%for i in excucao%}
-            <li>
-            {{ i.nome }}
-            {% if i.concluida %}
+<ul>
+    {% for execucao in execucoes %}
+        <li>
+            {{ execucao.nome }}
+            {% if execucao.concluida %}
                 (✓ Concluída)
             {% else %}
                 (☐ Pendente)
             {% endif %}
             <br>
-            <small>Criada em: {{ i.criada_em }}</small>
+            <small>Criada em: {{ execucao.criada_em }}</small>
         </li>
     {% empty %}
         <li>Você ainda não tem execuções cadastradas.</li>
     {% endfor %}
-    </ul>
+</ul>
 
 {% endblock %}
