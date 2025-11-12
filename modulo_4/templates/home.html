@@ -1,60 +1,20 @@
 {% extends 'base.html' %}
-
-{% block title %}Página Inicial - Meu Site{% endblock %}
-
+...
 {% block content %}
+    <h1>Olá, {{ nome_usuario }}!</h1>
+    
+    <hr>
+    <h3>Nova Tarefa:</h3>
 
-<h1>Olá, {{ nome_usuario }}!</h1>
+    <form method="POST">
+        {% csrf_token %}
 
-<p>Este HTML está separado do meu código Python.</p>
+        {{ form.as_p }}
 
-<h3>Tecnologias que estou aprendendo:</h3>
-<ul>
-    {% for tec in tecnologias %}
-        <li>{{ tec }}</li>
-    {% endfor %}
-</ul>
-
-{% if nome_usuario == 'Thiago' %}
-    <p>Este é um conteúdo especial para o Thiago!</p>
-{% endif %}
-
-<hr><h2>Minha lista de tarefas (do Banco de Dados):</h2>
-
-<ul>
-    {% for tarefa in tarefas %}
-        <li>
-            {{ tarefa.titulo }}
-            {% if tarefa.concluida %}
-                (✓ Concluída)
-            {% else %}
-                (☐ Pendente)
-            {% endif %}
-            <br>
-            <small>Criada em: {{ tarefa.criada_em }}</small>
-        </li>
-    {% empty %}
-        <li>Você ainda não tem tarefas cadastradas.</li>
-    {% endfor %}
-</ul>
-
-<hr><h2>Minhas execuções (do Banco de Dados):</h2>
-
-<ul>
-    {% for execucao in execucoes %}
-        <li>
-            {{ execucao.nome }}
-            {% if execucao.concluida %}
-                (✓ Concluída)
-            {% else %}
-                (☐ Pendente)
-            {% endif %}
-            <br>
-            <small>Criada em: {{ execucao.criada_em }}</small>
-        </li>
-    {% empty %}
-        <li>Você ainda não tem execuções cadastradas.</li>
-    {% endfor %}
-</ul>
+        <button type="submit">Adicionar Tarefa</button>
+    </form>
+    <hr>
+    <h2>Minha Lista de Tarefas...</h2>
+    ... (o resto do seu arquivo) ...
 
 {% endblock %}
