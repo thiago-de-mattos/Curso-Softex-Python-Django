@@ -20,13 +20,11 @@ from django.contrib.auth import views as auth_views
  
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('core.urls')), # 2. Adicione esta linha
+    path('', include('core.urls')), # Nossas URLs do app 'core'
     path('login/',
-        auth_views.LoginView.as_view(template_name='login.html'),
+        auth_views.LoginView.as_view(template_name='login.html',  next_page='home'),
         name='login'),
     path('logout/',
         auth_views.LogoutView.as_view(next_page='login'),
         name='logout'),
-
-
 ]
