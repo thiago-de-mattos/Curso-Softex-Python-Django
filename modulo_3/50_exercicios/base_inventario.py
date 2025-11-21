@@ -31,4 +31,6 @@ class Inventario:
            except ValueError as e:
                print('erro', e)
         else:
-            print("estoque vazio nada para remover")
+            print("estoque vazio nada")
+
+            
