@@ -6,10 +6,6 @@ urlpatterns = [
         'home/',
         views.home,
         name='home',),
-    path(
-        'login/',
-        views.login,
-        name='login',),
 
     path('tarefa/<int:pk>/concluir/',
           views.concluir_tarefa,

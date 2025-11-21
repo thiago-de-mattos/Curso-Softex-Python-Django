@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm # 1. Importe o form
 from django.contrib.auth import login # 2. Importe a função 'login'
-from django.contrib.auth.decorators import login_required # 1. Importe o decorado
+from django.contrib.auth.decorators import login_required # 1. Importe o decorador
 from .models import Tarefa
 from .forms import TarefaForm
 
 @login_required
-
 def home(request):
     if request.method == 'POST':
         # Cria uma instância do form e preenche com os dados do POST
@@ -51,6 +50,7 @@ def concluir_tarefa(request, pk):
         tarefa.save() # Não se esqueça de salvar!
     return redirect('home')
 
+@login_required
 def deletar_tarefa(request, pk):
     # 1. Busca a tarefa
     tarefa = get_object_or_404(Tarefa, pk=pk, user=request.user)
@@ -66,11 +66,11 @@ def register(request):
     if request.method == 'POST':
         # Cria uma instância do formulário com os dados enviados
         form = UserCreationForm(request.POST)
-    # Verifica se o formulário é válido (ex: senhas batem, username não existe)
-    if form.is_valid():
-        user = form.save() # Salva o novo usuário no banco
-        login(request, user) # Faz o login automático do usuário
-        return redirect('home')# Redireciona para a home
+        # Verifica se o formulário é válido (ex: senhas batem, username não existe)
+        if form.is_valid():
+            user = form.save() # Salva o novo usuário no banco
+            login(request, user) # Faz o login automático do usuário
+            return redirect('home')# Redireciona para a home
     # Se a requisição for GET, o usuário apenas visitou a página
     else:
         form = UserCreationForm() # Cria um formulário de cadastro vazio
