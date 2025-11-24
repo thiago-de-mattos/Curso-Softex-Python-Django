@@ -4,7 +4,7 @@ from .models import Tarefa
 # 1. Crie uma classe que herda de admin.ModelAdmin
 # A convenção é usar o nome do Model + "Admin"
 class TarefaAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'user', 'concluida', 'criada_em')
+    list_display = ('titulo', 'user','get_user_email', 'concluida', 'criada_em')
     #list_display = ('titulo', 'user', 'concluida', 'criada_em')
     list_filter = ('concluida', 'user', 'criada_em')
     # Adiciona uma barra de busca
