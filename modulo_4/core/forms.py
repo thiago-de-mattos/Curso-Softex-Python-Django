@@ -15,7 +15,7 @@ class TarefaForm(forms.ModelForm):
             # ...filtre o 'queryset' (a lista de opções) do campo 'project'
             # para mostrar apenas os projetos onde o 'user' é o usuário logado.
             self.fields['project'].queryset = Project.objects.filter(user=user)
-class Meta:
-    model = Tarefa
-    # 5. Adicione 'project' aos campos do formulário
-    fields = ['titulo', 'project']
+    class Meta:
+        model = Tarefa
+        # 5. Adicione 'project' aos campos do formulário
+        fields = ['titulo', 'project']
