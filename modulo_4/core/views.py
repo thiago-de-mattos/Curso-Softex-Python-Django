@@ -8,8 +8,8 @@ from .forms import TarefaForm
 @login_required
 def home(request):
     if request.method == 'POST':
-        # Cria uma instância do form e preenche com os dados do POST
-        form = TarefaForm(request.POST)
+       # 1. Passe o 'user' logado para o formulário no POST
+        form = TarefaForm(request.POST, user=request.user)
         # 4. O Django valida os dados (max_length, etc.)
         if form.is_valid():
             # 'commit=False' cría o objeto na memória, mas não salva no banco.
@@ -24,16 +24,15 @@ def home(request):
         # Se o form NÃO for válido, o código continua e
         # o 'form' (com os erros) será enviado para o template
     else:
-        # 7. Lógica de GET: Se o usuário apenas visitou a página
-        form = TarefaForm()  # Cria um formulário vazio
+        # 2. Passe o 'user' logado para o formulário no GET
+        form = TarefaForm(user=request.user)
 
     # 8. A busca de dados (fora dos 'ifs', pois é necessária sempre)
     todas_as_tarefas = Tarefa.objects.filter(user=request.user).order_by('-criada_em')  # Ordena pelas mais novas
 
     # 9. Atualize o contexto para incluir o formulário
     context = {
-        'nome_usuario': 'Thiago',
-        'tecnologias': ['Python', 'Django', 'HTML', 'CSS'],
+        'nome_usuario': request.user.username,
         'tarefas': todas_as_tarefas,
         'form': form,
     }
