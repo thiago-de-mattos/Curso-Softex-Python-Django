@@ -1,0 +1,6 @@
+#Situação#        |Status#          |Motivo#
++Tarefa criada    |201 Created      |Novo recurso foi criado
++Dados inválidos  |400 Bad Request  |Erro do cliente (dados ruins)
++Não autenticado  |401 Unauthorized |Falta de autenticação
++Sem permissão    |403 Forbidden    |Autenticado, mas sem acesso
++Servidor quebrou |500 Server       |Error Bug no código
