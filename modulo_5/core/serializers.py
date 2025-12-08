@@ -14,26 +14,9 @@ class TarefaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tarefa
-        fields = ['id', 'titulo', 'concluida', 'criada_em']
+        fields = ['id', 'user', 'titulo', 'concluida', 'criada_em']
         read_only_fields = ['id', 'criada_em']
        
-        def validate(self, data):
-            """
-            Validação de objeto completo (múltiplos campos).
-
-            Exemplo: Tarefas com palavra "urgente" não podem
-            começar como concluídas.
-            """
-            titulo = data.get('titulo', '').lower()
-            concluida = data.get('concluida', False)
-
-            if 'urgente' in titulo and concluida:
-                raise serializers.ValidationError(
-                    "Tarefas urgentes não podem ser criadas como concluídas."
-                )
-
-            return data
-
         def validate_titulo(self, value):
             """
             Validação customizada para o campo 'titulo'.
@@ -46,9 +29,7 @@ class TarefaSerializer(serializers.ModelSerializer):
             # Remover espaços em branco
             value = value.strip()
             user = self.context['request'].user
-
           
-
             # Validação 1: Não vazio
             if not value:
                 raise serializers.ValidationError(
