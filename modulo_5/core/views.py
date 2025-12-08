@@ -6,21 +6,28 @@ from .serializers import TarefaSerializer
 from rest_framework.exceptions import ValidationError
 from django.db import IntegrityError
 import logging
-
 logger = logging.getLogger(__name__)
 
 class ListaTarefasAPIView(APIView):
+    
+    def get(self, request, format=None):
+        """Lista todas as tarefas."""
+        tarefas = Tarefa.objects.all()
+        serializer = TarefaSerializer(tarefas, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
     def post(self, request, format=None):
         try:
             serializer = TarefaSerializer(data=request.data)
 
             if serializer.is_valid():
                 serializer.save()
+                logger.info(f"Tarefa criada: {serializer.data['id']}")
                 return Response(
                     serializer.data,
                         status=status.HTTP_201_CREATED
                 )
-
+            logger.warning(f"Validação falhou: {serializer.errors}")
             return Response(
                 serializer.errors,
                     status=status.HTTP_400_BAD_REQUEST
@@ -33,51 +40,8 @@ class ListaTarefasAPIView(APIView):
             )
 
         except Exception as e:
-            # Erro inesperado
+            logger.error(f"Erro ao criar tarefa: {str(e)}")
             return Response(
                 {'error': 'Erro interno do servidor.'},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-    def get(self, request, format=None):
-        """Lista todas as tarefas."""
-        tarefas = Tarefa.objects.all()
-        serializer = TarefaSerializer(tarefas, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def post(self, request, format=None):
-        """
-        Cria uma nova tarefa.
-
-        Args:
-        request.data: JSON com dados da tarefa
-        {
-        "titulo": "string",
-        "concluida": boolean (opcional, default=False)
-        }
-
-        Returns:
-        201 Created: Tarefa criada com sucesso
-        400 Bad Request: Dados inválidos
-        """
-        # 1. INSTANCIAR: Criar serializer com dados recebidos
-        serializer = TarefaSerializer(data=request.data)
-
-        # 2. VALIDAR: Checar se os dados são válidos
-        if serializer.is_valid():
-            # 3. SALVAR: Persistir no banco de dados
-            serializer.save()
-
-            # 4. RESPONDER: Retornar objeto criado + status 201
-            return Response(
-            serializer.data,
-            status=status.HTTP_201_CREATED
-            )
-
-        # 5. ERRO: Retornar erros de validação + status 400
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
-        
-
