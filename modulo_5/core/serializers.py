@@ -45,6 +45,9 @@ class TarefaSerializer(serializers.ModelSerializer):
             """
             # Remover espaços em branco
             value = value.strip()
+            user = self.context['request'].user
+
+          
 
             # Validação 1: Não vazio
             if not value:
@@ -62,12 +65,7 @@ class TarefaSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                 "O título não pode conter apenas números."
                 )
-
-            return value
-        def validate_titulo(self, value):
-            """Impedir títulos duplicados para o mesmo usuário."""
-            user = self.context['request'].user
-
+            
             if Tarefa.objects.filter(user=user, titulo=value).exists():
                 raise serializers.ValidationError(
                 "Você já tem uma tarefa com este título."
