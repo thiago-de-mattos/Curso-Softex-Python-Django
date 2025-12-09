@@ -36,12 +36,12 @@ class ListaTarefasAPIView(APIView):
             # Erro de constraint no banco (ex: UNIQUE)
             return Response(
                 {'error': 'Violação de integridade no banco de dados.'},
-                    status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST
             )
 
         except Exception as e:
             logger.error(f"Erro ao criar tarefa: {str(e)}")
             return Response(
                 {'error': 'Erro interno do servidor.'},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
