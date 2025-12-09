@@ -31,4 +31,4 @@ class Tarefa(models.Model):
         ordering = ['-criada_em']
 
         def __str__(self):
-            return f"{self.titulo} ({' ' if self.concluida else ' '})"
+            return f"{self.titulo} ({'✓' if self.concluida else '✗'})"
