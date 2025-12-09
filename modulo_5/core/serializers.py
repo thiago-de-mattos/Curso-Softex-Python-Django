@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils.timezone import now
 from .models import Tarefa
 
 class TarefaSerializer(serializers.ModelSerializer):
@@ -14,7 +15,7 @@ class TarefaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tarefa
-        fields = ['id', 'user', 'titulo', 'concluida', 'criada_em']
+        fields = ['id', 'user', 'titulo', 'concluida', 'criada_em', 'prioridade', 'prazo']
         read_only_fields = ['id', 'criada_em']
        
     def validate_titulo(self, value):
@@ -29,6 +30,8 @@ class TarefaSerializer(serializers.ModelSerializer):
         # Remover espaços em branco
         value = value.strip()
         # Validação 1: Não vazio
+     
+            
         if not value:
             raise serializers.ValidationError(
                 "O título não pode ser vazio ou conter apenas espaços."
@@ -43,5 +46,47 @@ class TarefaSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "O título não pode conter apenas números."
             )
+        
+        user = self.context['request'].user
+
+        if Tarefa.objects.filter(user=user, titulo=value).exists():
+            raise serializers.ValidationError(
+                "Você já tem uma tarefa com este título."
+            )
 
         return value
+
+    def validate_prioridade(self, value):
+
+        value = value.strip().lower()
+        valores_validos = ["baixa", "media", "alta"]
+
+        if value.isdigit():
+            raise serializers.ValidationError(
+                "Prioridade não pode ser números. use: baixa, media ou alta"
+            )
+        
+        if value not in valores_validos:
+            raise serializers.ValidationError(
+                "prioridade só aceita valores como: baixa, media ou alta "
+            )
+        return value
+        
+    def validate_prazo(self, value):
+
+        if value and value < now().date():
+            raise serializers.ValidationError(
+                "O prazo não pode ser no passado."
+            )
+        return value
+
+    def validate(self, data):
+        concluida = data.get('concluida', False)
+        prazo = data.get('prazo')
+       
+        if not concluida and not prazo:
+                raise serializers.ValidationError({
+                    'prazo': 'O prazo é obrigatório para tarefas não concluídas.'
+                })
+
+        return data
