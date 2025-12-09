@@ -25,10 +25,24 @@ class Tarefa(models.Model):
     verbose_name='Criada em'
     )
 
+    PRIORIDADE_CHOICES = [
+    ('baixa', 'Baixa'),
+    ('media', 'Média'),
+    ('alta', 'Alta'),
+    ]
+
+    prioridade = models.CharField(
+    max_length=10,
+    choices=PRIORIDADE_CHOICES,
+    default='media'
+    )
+
+    prazo = models.DateField(null=True, blank=True)
+  
     class Meta:
         verbose_name = 'Tarefa'
         verbose_name_plural = 'Tarefas'
         ordering = ['-criada_em']
 
-        def __str__(self):
-            return f"{self.titulo} ({'✓' if self.concluida else '✗'})"
+    def __str__(self):
+        return f"{self.titulo} ({'✓' if self.concluida else '✗'})"
