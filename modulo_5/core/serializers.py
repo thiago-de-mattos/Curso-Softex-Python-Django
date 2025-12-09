@@ -17,39 +17,31 @@ class TarefaSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'titulo', 'concluida', 'criada_em']
         read_only_fields = ['id', 'criada_em']
        
-        def validate_titulo(self, value):
-            """
-            Validação customizada para o campo 'titulo'.
+    def validate_titulo(self, value):
+        """
+        Validação customizada para o campo 'titulo'.
 
-            Regras:
-            - Não pode ser vazio (após strip)
-            - Não pode conter apenas números
-            - Deve ter pelo menos 3 caracteres
-            """
-            # Remover espaços em branco
-            value = value.strip()
-            user = self.context['request'].user
-          
-            # Validação 1: Não vazio
-            if not value:
-                raise serializers.ValidationError(
+        Regras:
+        - Não pode ser vazio (após strip)
+        - Não pode conter apenas números
+        - Deve ter pelo menos 3 caracteres
+        """
+        # Remover espaços em branco
+        value = value.strip()
+        # Validação 1: Não vazio
+        if not value:
+            raise serializers.ValidationError(
                 "O título não pode ser vazio ou conter apenas espaços."
-                )
-
-            # Validação 2: Mínimo de caracteres
-            if len(value) < 3:
-                raise serializers.ValidationError(
-                "O título deve ter pelo menos 3 caracteres."
-                )
-            # Validação 3: Não apenas números
-            if value.isdigit():
-                raise serializers.ValidationError(
+            )
+        # Validação 2: Mínimo de caracteres
+        if len(value) < 3:
+            raise serializers.ValidationError(
+            "O título deve ter pelo menos 3 caracteres."
+            )
+        # Validação 3: Não apenas números
+        if value.isdigit():
+            raise serializers.ValidationError(
                 "O título não pode conter apenas números."
-                )
-            
-            if Tarefa.objects.filter(user=user, titulo=value).exists():
-                raise serializers.ValidationError(
-                "Você já tem uma tarefa com este título."
-                )
+            )
 
-            return value
+        return value
