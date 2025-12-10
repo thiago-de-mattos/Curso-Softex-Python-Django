@@ -39,6 +39,7 @@ class Tarefa(models.Model):
 
     prazo = models.DateField(null=True, blank=True)
   
+    data_conclusao = models.DateField(null=True, blank=True)
     class Meta:
         verbose_name = 'Tarefa'
         verbose_name_plural = 'Tarefas'
