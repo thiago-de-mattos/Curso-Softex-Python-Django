@@ -46,13 +46,6 @@ class TarefaSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "O título não pode conter apenas números."
             )
-        
-        user = self.context['request'].user
-
-        if Tarefa.objects.filter(user=user, titulo=value).exists():
-            raise serializers.ValidationError(
-                "Você já tem uma tarefa com este título."
-            )
 
         return value
 
