@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.utils.timezone import now
 from .models import Tarefa
+from datetime import date
 
 class TarefaSerializer(serializers.ModelSerializer):
     # Customizar mensagens padrão
@@ -15,7 +16,7 @@ class TarefaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tarefa
-        fields = ['id', 'user', 'titulo', 'concluida', 'criada_em', 'prioridade', 'prazo']
+        fields = ['id', 'user', 'titulo', 'concluida', 'criada_em', 'prioridade', 'prazo', 'data_conclusao']
         read_only_fields = ['id', 'criada_em']
        
     def validate_titulo(self, value):
@@ -81,5 +82,26 @@ class TarefaSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({
                     'prazo': 'O prazo é obrigatório para tarefas não concluídas.'
                 })
+
+        return data
+        
+    def validate_data_conclusao(self,data):
+        data_conclusao = data.get("data_conclusao")
+        prazo = data.get('prazo')
+        concluida = data.get("concluida", False)
+
+        if data_conclusao < prazo:
+            raise serializers.ValidationError({
+                "A data de conclussão não pode ser menor que o prazo"
+            })
+        
+        if concluida and not data_conclusao:
+            data_conclusao = date.today()
+            data["data_conclusao"] = data_conclusao
+
+        if not concluida and data_conclusao:
+            raise serializers.ValidationError({
+                "A data de conclusão so deve existir se a tarefa estiver concluida"
+            })
 
         return data
