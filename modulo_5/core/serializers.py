@@ -77,31 +77,26 @@ class TarefaSerializer(serializers.ModelSerializer):
     def validate(self, data):
         concluida = data.get('concluida', False)
         prazo = data.get('prazo')
-       
-        if not concluida and not prazo:
-                raise serializers.ValidationError({
-                    'prazo': 'O prazo é obrigatório para tarefas não concluídas.'
-                })
-
-        return data
-        
-    def validate_data_conclusao(self,data):
         data_conclusao = data.get("data_conclusao")
-        prazo = data.get('prazo')
-        concluida = data.get("concluida", False)
-
-        if data_conclusao < prazo:
+        
+        if not concluida and not prazo:
             raise serializers.ValidationError({
-                "A data de conclussão não pode ser menor que o prazo"
+                'prazo': 'O prazo é obrigatório para tarefas não concluídas.'
+            })
+
+        if not concluida and data_conclusao:
+            raise serializers.ValidationError({
+                'data_conclusao': 'A data de conclusão só deve existir se a tarefa estiver concluída.'
             })
         
         if concluida and not data_conclusao:
             data_conclusao = date.today()
             data["data_conclusao"] = data_conclusao
 
-        if not concluida and data_conclusao:
-            raise serializers.ValidationError({
-                "A data de conclusão so deve existir se a tarefa estiver concluida"
-            })
+        if not concluida and data_conclusao and prazo:
+            if data_conclusao < prazo:
+                raise serializers.ValidationError({
+                    'data_conclusao': 'A data de conclusão não pode ser menor que o prazo.'
+                })
 
         return data
