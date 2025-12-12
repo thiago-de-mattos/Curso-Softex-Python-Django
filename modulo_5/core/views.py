@@ -157,3 +157,26 @@ class DetalheTarefaAPIView(APIView):
         tarefa.delete()
         # 3. RESPONDER: 204 No Content (sucesso sem corpo de resposta)
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    def post(self, request, pk, format=None):
+
+        if request.path.endswith("/duplicar/"):
+
+            tarefa_original = self.get_object(pk)
+
+            nova_tarefa = Tarefa.objects.create(
+                user=tarefa_original.user,
+                titulo=tarefa_original.titulo + " (cópia)",
+                prioridade=tarefa_original.prioridade,
+                prazo=tarefa_original.prazo,
+                concluida=False,              
+                data_conclusao=None           
+            )
+
+            serializer = TarefaSerializer(nova_tarefa)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(
+            {"error": "Rota não encontrada."},
+            status=status.HTTP_404_NOT_FOUND
+        )
