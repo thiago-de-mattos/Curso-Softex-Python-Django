@@ -7,6 +7,7 @@ from django.db import IntegrityError
 import logging
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
+from django.utils.timezone import now
 
 logger = logging.getLogger(__name__)
 
@@ -179,4 +180,25 @@ class DetalheTarefaAPIView(APIView):
         return Response(
             {"error": "Rota não encontrada."},
             status=status.HTTP_404_NOT_FOUND
+        )
+    
+class concluiTodasTarefas(APIView):
+
+    def patch(self, request, format=None):
+
+        hoje = now().date()
+        
+        tarefas_atualizadas = Tarefa.objects.filter(
+            concluida=False
+        ).update(
+            concluida=True,
+            data_conclusao=hoje
+        )
+
+        return Response(
+            {
+                "mensagem": "Tarefas concluídas com sucesso.",
+                "total_atualizadas": tarefas_atualizadas
+            },
+            status=status.HTTP_200_OK
         )
