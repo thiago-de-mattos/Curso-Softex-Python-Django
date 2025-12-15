@@ -8,13 +8,16 @@ import logging
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
 
 logger = logging.getLogger(__name__)
 
 
 class ListaTarefasAPIView(APIView):
-    
-    
+
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, format=None):
         tarefas = Tarefa.objects.all()
         serializer = TarefaSerializer(tarefas, many=True)
@@ -26,7 +29,7 @@ class ListaTarefasAPIView(APIView):
             serializer = TarefaSerializer(data=request.data)
             
             if serializer.is_valid():
-                serializer.save()
+                serializer.save(user=self.request.user)
                 logger.info(f"[INFO]: Tarefa criada: {serializer.data['id']}")
                 return Response(
                     serializer.data,
@@ -184,6 +187,7 @@ class DetalheTarefaAPIView(APIView):
     
 class concluiTodasTarefas(APIView):
 
+
     def patch(self, request, format=None):
 
         hoje = now().date()
@@ -202,3 +206,23 @@ class concluiTodasTarefas(APIView):
             },
             status=status.HTTP_200_OK
         )
+    
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        try:
+            refresh_token = request.data.get("refresh")
+            token = RefreshToken(refresh_token)
+            token.blacklist() # Adiciona o token à lista negra
+
+            return Response(
+                {"detail": "Logout realizado com sucesso."},
+                status=status.HTTP_205_RESET_CONTENT # 205 é a resposta padrão para "reset content"
+                
+                )
+        except Exception: # Captura exceções como token_not_valid
+            return Response(
+            {"detail": "Token inválido."},
+            status=status.HTTP_400_BAD_REQUEST
+            )
