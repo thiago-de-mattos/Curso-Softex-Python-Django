@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ListaTarefasAPIView, EstatisticasTarefasAPIView, DetalheTarefaAPIView, concluiTodasTarefas
+from .views import ListaTarefasAPIView, EstatisticasTarefasAPIView, DetalheTarefaAPIView, concluiTodasTarefas, LogoutView
 
 app_name = 'core'
 urlpatterns = [
@@ -8,4 +8,5 @@ urlpatterns = [
     path('tarefas/<int:pk>/duplicar/', DetalheTarefaAPIView.as_view()),
     path('tarefas/<int:pk>/',DetalheTarefaAPIView.as_view(),name='detalhe-tarefa'),
     path('tarefas/concluir-todas/', concluiTodasTarefas.as_view()),
+    path('logout/', LogoutView.as_view(), name='logout'), # ← Novo endpoint
 ]
