@@ -52,19 +52,32 @@ REST_FRAMEWORK = {
         # Define JWT como método de autenticação PADRÃO
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '10/day', # 100 requisições por dia para anônimos (ex: /token/)
+        'user': '3000/day' # 3000 requisições por dia para autenticados (ex: /tarefas/)
+    }
 }
+
 
 SIMPLE_JWT = {
     # Tempo de vida do Access Token (curto!)
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     # Tempo de vida do Refresh Token (longo!)
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     # Define o esquema de autenticação no header HTTP
     'AUTH_HEADER_TYPES': ('Bearer',),
     # Algoritmo de criptografia
     'ALGORITHM': 'HS256',
     # Nome do campo de usuário no payload (user_id é padrão)
     'USER_ID_CLAIM': 'user_id',
+    # Rotacionar refresh tokens (Melhor Prática de Segurança!)
+    'ROTATE_REFRESH_TOKENS': True,
+    # A cada renovação, o token antigo é invalidado e um novo é gerado
+    'BLACKLIST_AFTER_ROTATION': True, # Requer 'token_blacklist'
 }
 
 
