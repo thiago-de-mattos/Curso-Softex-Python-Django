@@ -29,6 +29,7 @@ class RegisterView(generics.CreateAPIView):
 
 
 class TarefaListCreateAPIView(generics.ListCreateAPIView):
+
     serializer_class = TarefaSerializer
     permission_classes = [IsAuthenticated] # Exige Token válido
 
@@ -76,7 +77,21 @@ class TarefaListCreateAPIView(generics.ListCreateAPIView):
                 {'error': 'Erro interno do servidor.'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
+class TarefaRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    
+    serializer_class = TarefaSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        """
+        Garante que operações de detalhe (GET, PUT, DELETE por ID)
+        só encontrem o objeto se ele pertencer ao usuário.
+        """
+        user = self.request.user
 
+        return Tarefa.objects.filter(user=user)
+    
 class EstatisticasTarefasAPIView(APIView):
 
 
