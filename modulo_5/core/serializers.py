@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.utils.timezone import now
 from .models import Tarefa
 from datetime import date
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
 class TarefaSerializer(serializers.ModelSerializer):
     # Customizar mensagens padrão
@@ -120,14 +120,19 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         # Extrai a senha dos dados validados
         password = validated_data.pop('password')
 
-        # Extrai email e username
-        email = validated_data.get('email', '')
-        username = validated_data['username']
-
-        # Cria a instância usando o método seguro do Django
         user = User.objects.create_user(
-            username=username,
-            email=email,
+            username=validated_data['username'],
+            email=validated_data.get('email', ''),
             password=password
         )
+        try:
+            # Busca o grupo 'Comum'
+            grupo_comum = Group.objects.get(name='Comum')
+            # Adiciona o usuário ao grupo
+            user.groups.add(grupo_comum)
+        except Group.DoesNotExist:
+            # Fallback: Se o grupo não existir, o usuário é criado sem grupo.
+            # Em produção, deveríamos logar um erro aqui.
+            pass
+        
         return user
