@@ -1,9 +1,9 @@
 from django.urls import path
-from .views import ListaTarefasAPIView, EstatisticasTarefasAPIView, DetalheTarefaAPIView, concluiTodasTarefas, LogoutView
+from .views import TarefaListCreateAPIView, RegisterView ,EstatisticasTarefasAPIView, DetalheTarefaAPIView, concluiTodasTarefas, LogoutView
 
 app_name = 'core'
 urlpatterns = [
-    path('tarefas/', ListaTarefasAPIView.as_view(), name='lista-tarefas'),
+    path('tarefas/', TarefaListCreateAPIView.as_view(), name='lista-tarefas'),
     path('tarefas/estatisticas/', EstatisticasTarefasAPIView.as_view(), name='estatisticas'),
     path('tarefas/<int:pk>/duplicar/', DetalheTarefaAPIView.as_view()),
     path('tarefas/<int:pk>/',DetalheTarefaAPIView.as_view(),name='detalhe-tarefa'),

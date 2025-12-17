@@ -8,20 +8,43 @@ import logging
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
+from .serializers import TarefaSerializer, UserRegistrationSerializer
+from django.contrib.auth.models import User
+from rest_framework import generics
+
 
 logger = logging.getLogger(__name__)
 
+class RegisterView(generics.CreateAPIView):
+    """
+    Endpoint para cadastro de novos usuários.
+    Acesso: Público (Qualquer um pode criar conta).
+    """
+    queryset = User.objects.all()
+    permission_classes = [AllowAny] # Sobrescreve o padrão global
+    serializer_class = UserRegistrationSerializer
 
-class ListaTarefasAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
 
-    def get(self, request, format=None):
-        tarefas = Tarefa.objects.all()
-        serializer = TarefaSerializer(tarefas, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+class TarefaListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = TarefaSerializer
+    permission_classes = [IsAuthenticated] # Exige Token válido
+
+    def get_queryset(self):
+        """
+        Sobrescreve o comportamento padrão para retornar APENAS
+        os dados pertencentes ao usuário logado.
+        """
+        # 1. Recupera o usuário validado pelo JWT
+        user = self.request.user
+        # 2. Retorna o filtro. O Django fará o WHERE user_id = X no banco.
+        return Tarefa.objects.filter(user=user)
+    
+    def perform_create(self, serializer):
+        # Garante que a tarefa criada seja vinculada ao usuário logado
+        serializer.save(user=self.request.user)
     
     def post(self, request, format=None):
 

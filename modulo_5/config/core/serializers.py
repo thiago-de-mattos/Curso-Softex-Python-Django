@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.utils.timezone import now
 from .models import Tarefa
 from datetime import date
+from django.contrib.auth.models import User
 
 class TarefaSerializer(serializers.ModelSerializer):
     # Customizar mensagens padrão
@@ -99,3 +100,34 @@ class TarefaSerializer(serializers.ModelSerializer):
                 })
 
         return data
+    
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    # Definimos 'write_only=True' para que a senha seja aceita no cadastro (POST),
+    # mas NUNCA seja devolvida na resposta (Response JSON).
+    password = serializers.CharField(
+        write_only=True,
+        required=True,
+        style={'input_type': 'password'}
+    )
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']
+
+    def create(self, validated_data):
+        """
+        Intercepta a criação para usar o 'create_user' e hashear a senha.
+        """
+        # Extrai a senha dos dados validados
+        password = validated_data.pop('password')
+
+        # Extrai email e username
+        email = validated_data.get('email', '')
+        username = validated_data['username']
+
+        # Cria a instância usando o método seguro do Django
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+        return user
