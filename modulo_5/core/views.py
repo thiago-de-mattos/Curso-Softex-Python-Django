@@ -13,7 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import TarefaSerializer, UserRegistrationSerializer
 from django.contrib.auth.models import User
 from rest_framework import generics
-
+from .permissions import IsGerente 
 
 logger = logging.getLogger(__name__)
 
@@ -81,17 +81,23 @@ class TarefaListCreateAPIView(generics.ListCreateAPIView):
 class TarefaRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     
     serializer_class = TarefaSerializer
-    permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        """
-        Garante que operações de detalhe (GET, PUT, DELETE por ID)
-        só encontrem o objeto se ele pertencer ao usuário.
-        """
-        user = self.request.user
-
-        return Tarefa.objects.filter(user=user)
+        return Tarefa.objects.filter(user=self.request.user)
     
+    def get_permissions(self):
+        """
+        Instancia e retorna a lista de permissões que esta view requer,
+        dependendo do método HTTP da requisição.
+        """
+        if self.request.method == 'DELETE':
+            # Para deletar: Precisa estar logado E ser Gerente
+            # A ordem importa: primeiro checa login, depois o grupo
+            return [IsAuthenticated(), IsGerente()]
+        
+        # Para GET, PUT, PATCH: Basta estar logado (e ser dono, garantido pelo queryset)
+        return [IsAuthenticated()]
+
 class EstatisticasTarefasAPIView(APIView):
 
 
